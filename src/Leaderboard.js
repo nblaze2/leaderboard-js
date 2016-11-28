@@ -1,3 +1,5 @@
+var TeamObject = require('./Team.js').TeamObject;
+
 const gameInfo = [
   {
     home_team: 'Patriots',
@@ -25,43 +27,65 @@ const gameInfo = [
   }
 ]
 
-function leaderboard(team) {
+// var teamObjs = [];
+var teamNames = [];
 
-}
+function Leaderboard(gameInfo) {
+  this.gameInfo = gameInfo;
+  this.teamObjs = [];
+  this.createTeamObjs = function() {
+    this.gameInfo.forEach(game => { // arrow functions default to local 'this'
+      if (!teamNames.includes(game['home_team'])) {
+        teamNames.push(game['home_team']);
+        this.teamObjs.push(new TeamObject(game['home_team']));
+      } else if (!teamNames.includes(game['away_team'])) {
+        teamNames.push(game['away_team']);
+        this.teamObjs.push(new TeamObject(game['away_team']));
+      }
+    });
+  }
 
-function TeamObjects(name, rank, wins, loses) {
-  this.name = name;
-  this.rank = null;
-  this.wins = 0;
-  this.loses = 0;
-}
+  this.setWinsLosses = function() {
+    var gameInfo = this.gameInfo;
+    for (var i = 0; i < gameInfo.length; i++) {
+      if (gameInfo[i].home_score > gameInfo[i].away_score) {
+        this.teamObjs.find(function(x) {
+          return x.name == gameInfo[i].home_team;
+        }).wins += 1;
+        this.teamObjs.find(x => x.name == gameInfo[i].away_team).losses += 1;
+      } else if (gameInfo[i].away_score > gameInfo[i].home_score) {
+        this.teamObjs.find(x => x.name == gameInfo[i].away_team).wins += 1;
+        this.teamObjs.find(x => x.name == gameInfo[i].home_team).losses += 1;
+      } // x => x.name is passing function as argument
+    }
+  };
 
-function buildTeamNames(gameInfo) {
-  var teamNames = []
+  this.rankTeams = function(teamObjs) {
+    // sorts by losing team, placing team with most losses at end
+    function compare(a,b) {
+      if (a.losses < b.losses) {
+        return -1;  // team with fewer losses is moved left (up the rankings)
+      }
+      if (a.losses > b.losses) {
+        return 1; // team with more losses is moved right (down the rankings)
+      }
+      return 0;
+    };
 
-  gameInfo.forEach(function(game) { // use to iterate for team names
-    console.log(game['home_team']);
-  });
-  // for (i = 0; i < gameInfo.length; i++) {
-  //
-  //     if team_names.include?(game_data[:home_team]) == false
-  //       team_names << game_data[:home_team]
-  //     elsif team_names.include?(game_data[:away_team]) == false
-  //       team_names << game_data[:away_team]
-  //     end
-  //   end
-  //   team_names
-  // end
-  //
-  // def create_team_objects
-  //   team_names.each do |team|
-  //     @team_objects << Team.new(team)
-  //   end
-  //   @team_objects
-  // end
-  //
-  //
-  //
-  //
-}
+    this.teamObjs.sort(compare);
+
+    // assign ranks by order of appearance in the sorted array
+    for (var i = 0; i < this.teamObjs.length; i++) {
+      this.teamObjs[i].rank = i + 1;
+    }
+    this.teamObjs.forEach(function(team) {
+      console.log(team);
+    })
+  };
+};
+
 console.log('Teams\n-----');
+var l = new Leaderboard(gameInfo);
+l.createTeamObjs();
+l.setWinsLosses();
+l.rankTeams();
