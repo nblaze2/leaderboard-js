@@ -1,5 +1,5 @@
 var TeamObject = require('./Team.js').TeamObject;
-
+var pad = require('pad');
 const gameInfo = [
   {
     home_team: 'Patriots',
@@ -78,14 +78,57 @@ function Leaderboard(gameInfo) {
     for (var i = 0; i < this.teamObjs.length; i++) {
       this.teamObjs[i].rank = i + 1;
     }
-    this.teamObjs.forEach(function(team) {
-      console.log(team);
-    })
+  };
+  this.printLeaderboard = function() {
+    console.log(pad("-", 44, "-"));
+    console.log("| " + pad("Name", 10) + pad("Rank", 10) + pad("Wins", 10) + pad("Losses", 10) + " |");
+    for(var i = 0; i < this.teamObjs.length; i++) {
+      console.log("| " + pad(this.teamObjs[i].name, 10) + pad(String(this.teamObjs[i].rank), 10) + pad(String(this.teamObjs[i].wins), 10) + pad(String(this.teamObjs[i].losses), 10) + " |");
+    }
+    console.log(pad("-", 44, "-"));
   };
 };
 
-console.log('Teams\n-----');
+//
+//   function print() {
+//     var horizontal_border = "--------------------------------------------------\n";
+//     console.log(
+//     "#{horizontal_border}" +
+//     "| Name      Rank      Total Wins    Total Losses |\n" +
+//     "#{teams_to_string}" +
+//     "#{horizontal_border}"
+//     );
+//   }
+//
+//   var teamsToString = function(teamObjs)
+//     teamObjs.map { |team|
+//       "| " +
+//       team.name + filler_size(team.name) + "  " +
+//       "#{team.rank}" + "         " +
+//       "#{team.wins}" + "             " +
+//       "#{team.losses}" + "            " +
+//       "|\n"
+//     }.join("")
+//   end
+//
+//   def longest_team_name
+//     team_names.max_by { |team_name| team_name.length }
+//   end
+//
+//   def filler_size(name) # returns an empty string of varying length
+//     spaces = longest_team_name.length - name.length
+//     filler = ""
+//     spaces.times do |i|
+//       filler += " "
+//     end
+//     filler
+//   end
+// end
+
+
+console.log('NFL Leaderboard');
 var l = new Leaderboard(gameInfo);
 l.createTeamObjs();
 l.setWinsLosses();
 l.rankTeams();
+l.printLeaderboard();
